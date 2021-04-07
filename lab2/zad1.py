@@ -1,53 +1,77 @@
 import numpy as np
 from sys import maxsize
+from time import time
+from matplotlib import pyplot as plt
+from copy import deepcopy
 
 def findBiggestModuleIndexAt(A, idx):
-    N = len(A[idx])
+    N = len(A)
     maxModule = -maxsize
-    idx = 0
-    for i in range(N):
+    result = idx
+    for i in range(idx, N):
         if maxModule < abs(A[idx][i]):
             maxModule = abs(A[idx][i])
-            idx = i
+            result = i
 
-    return idx
+    return result
 
-def swapRows(A, row1, row2):
-    for i in range(len(A)):
-        A[i][row1], A[i][row2] = A[i][row2], A[i][row1]
+def generateMatrix(N):
+	A = np.random.random_sample((N,N))
+	B = np.random.random_sample((N,))
+	return A,B
 
-def addRow(A, row1, row2, multiplier):
-    for i in range(len(A)):
-        A[i][row1] += A[i][row2] * multiplier
+def gaussSolve(A, B):
 
-    
-
-
-def partialGaussJordan(A):
     N = len(A)
 
-    #main loop
-    for i in range(1):
+    for i in range(N):
         maxModuleIdx = findBiggestModuleIndexAt(A, i)
 
-        
-
         if maxModuleIdx != i:
-            swapRows(A, maxModuleIdx, i)
+            A[[maxModuleIdx, i]] = A[[i, maxModuleIdx]]
+            B[maxModuleIdx], B[i] = B[i], B[maxModuleIdx]
 
-        for i in range(N - 1):
-            for j in range(N):
-                print(A[j][i], end="")
-            print("")  
-        
-        for j in range(0, N - 1):
-            if j != i:
-                addRow(A, j, i, -(A[i][j]/A[i][i]))   
-        
+        for j in range(N):
+            if i != j:
+                multiplier = A[j][i] / A[i][i]
+
+                A[j] += - multiplier * A[i]
+                B[j] += - multiplier * B[i]           
+            
+    return B/np.diag(A)
+
+gaussTimes = []
+basicTimes = []
+leastSquaresTimes = []
 
 
-N = 4
-A = [[i + 1 for j in range(N)] for i in range(N + 1)]
-print(A)
 
-partialGaussJordan(A)
+for N in range(500, 1500, 100):
+    A1, B1 = generateMatrix(N)
+    A2, B2, A3, B3 = deepcopy(A1), deepcopy(B1), deepcopy(A1), deepcopy(B1)
+
+    print("")
+    print("---- Gauss method ----")
+    start = time()
+    result = gaussSolve(A1, B1)
+    end = time()
+    gaussTimes.append((N, end - start))
+    print("N =", N, " sec:", end-start)
+
+    print("")
+    print("---- Regular method ----")
+    start = time()
+    basicResult = np.linalg.solve(A2, B2)
+    end = time()
+    basicTimes.append((N, end - start))
+    print("N =", N, " sec:", end-start)
+
+
+    print("")
+    print("---- Least Squares method ----")
+    start = time()
+    lstsqResult = np.linalg.solve(A3, B3)
+    end = time()
+    leastSquaresTimes.append((N, end - start))
+    print("N =", N, " sec:", end-start)
+    
