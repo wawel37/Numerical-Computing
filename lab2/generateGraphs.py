@@ -7,6 +7,7 @@ def configureGraph(G):
     SEMEdge['index'] = 'E'
     SEMEdge['nodeFrom'] = SEMEdge['nodeTo'] = -1
     SEMEdge['voltage'] = random.randint(1,100)
+    SEMEdge['current'] = 'SEM'
 
     index = 0
     for (start, stop) in G.edges:
