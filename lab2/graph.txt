@@ -1,4 +1,7 @@
-1 2 1
+sigdelset(&tempMask, SIGUSR1);
+    sigdelset(&tempMask, SIGUSR2);
+    sigdelset(&tempMask, SIGRTMIN);
+    sigdelset(&tempMask, SIGRTMAX);1 2 1
 2 3 1
 3 4 1
 1 4 1
