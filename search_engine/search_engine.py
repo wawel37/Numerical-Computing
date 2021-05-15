@@ -77,7 +77,7 @@ def IDF(articles, termByDocument):
         idf = np.log(len(articles)/counter)
         termByDocument[wordIndex,:] *= idf
 
-def search(words, termByDocument, bagOfWords):
+def search(words, termByDocument, bagOfWords, k):
     q = np.zeros((len(termByDocument)))
     words = words.split()
 
@@ -95,15 +95,18 @@ def search(words, termByDocument, bagOfWords):
     result = [[index, value] for index, value in enumerate(result)]
     result.sort(key = lambda x: x[1], reverse=True)
 
-    return np.array(result[:3])
+    return np.array(result[:k % len(termByDocument[0])])
 
 def getResultArticles(results, articles):
     result = ''
     temp = list(articles.items())
-    for title, data in temp:
-        if data['index'] in results[:,0]:
-            result += title + '\n'
-            result += data['article'] + '\n\n'
+    for r in results:
+        for title, data in temp:
+            if data['index'] == r[0]:
+                result += title + '\n'
+                result += data['article'] + '\n\n'
+                break
+            
     return result
 
 # if __name__ == "__main__":

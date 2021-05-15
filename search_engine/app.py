@@ -14,7 +14,8 @@ def home():
 @app.route('/search', methods=['POST'])
 def searchRoute():
     query = request.form['query']
-    result = search(query, termByDocument, bagOfWords)
+    k = request.form['k']
+    result = search(query, termByDocument, bagOfWords, int(k))
     form = """
         <form action="/" method="get">
             <input type="submit" value="Go back">
