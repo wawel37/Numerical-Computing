@@ -1,7 +1,7 @@
 import numpy as np
+from numpy.core.numeric import outer
 
-#TODO
-#Less articles, memory error at termbydocument
+
 def readDataSet(filePath, numOfArticles):
 
     with open(filePath, "r") as file:
@@ -90,7 +90,7 @@ def search(words, termByDocument, bagOfWords, k):
     result = []
     for docIndex in range(len(termByDocument[0])):
         column = termByDocument[:,docIndex]
-        result.append(q.dot(column)/np.linalg.norm(column))
+        result.append(q.dot(column/np.linalg.norm(column)))
     
     result = [[index, value] for index, value in enumerate(result)]
     result.sort(key = lambda x: x[1], reverse=True)
@@ -109,13 +109,23 @@ def getResultArticles(results, articles):
             
     return result
 
-# if __name__ == "__main__":
-#     articles, bagOfWords = readDataSet('corpus.txt', 1000)
+def noiseReducion(termByDocument, k):
+    U, S, V = np.linalg.svd(termByDocument, full_matrices=False)
+    termByDocument = np.zeros((len(U), len(V)))
+    for i in range(k):
+        termByDocument += S[i] * np.outer(U.T[i], V[i])
+    
+    return termByDocument
 
-#     termByDocument = getTermByDocumentMatrix(bagOfWords, articles)
 
-#     IDF(articles, termByDocument)
+if __name__ == "__main__":
+    articles, bagOfWords = readDataSet('corpus.txt', 2000)
 
-#     result = search("mathematics", termByDocument, bagOfWords)
-#     print(result)
-#     printResultArticles(result, articles)
+    termByDocument = getTermByDocumentMatrix(bagOfWords, articles)
+
+    IDF(articles, termByDocument)
+    termByDocument = noiseReducion(termByDocument, 100)
+
+    print(len(bagOfWords))
+    result = search("mathematics", termByDocument, bagOfWords, 3)
+    print(getResultArticles(result, articles))

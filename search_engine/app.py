@@ -27,8 +27,10 @@ def searchRoute():
 
 if __name__ == "__main__":
     #running before the app acctually start working
+    
     articles, bagOfWords = readDataSet('corpus.txt', 1000)
     termByDocument = getTermByDocumentMatrix(bagOfWords, articles)
     IDF(articles, termByDocument)
+    # termByDocument = noiseReducion(termByDocument, 100)
 
     app.run()
